@@ -11,7 +11,9 @@ class RegistrationForm(forms.ModelForm):
         'placeholder': 'Re Password',
         'class' : 'form-control'
     }))
-
+    profile_picture = forms.ImageField(required=False, widget=forms.FileInput(attrs={
+        'class': 'form-control-file'
+    }))
 
     class Meta:
         model = Account
@@ -35,6 +37,28 @@ class RegistrationForm(forms.ModelForm):
         self.fields['email'].widget.attrs['placeholder'] = 'Email'
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
+        
+        # Add fields from UserProfile to the form
+        self.fields['address_line_1'] = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={
+            'placeholder': 'Address Line 1',
+            'class': 'form-control'
+        }))
+        self.fields['address_line_2'] = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={
+            'placeholder': 'Address Line 2',
+            'class': 'form-control'
+        }))
+        self.fields['city'] = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
+            'placeholder': 'City',
+            'class': 'form-control'
+        }))
+        self.fields['state'] = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
+            'placeholder': 'State',
+            'class': 'form-control'
+        }))
+        self.fields['country'] = forms.CharField(max_length=20, required=False, widget=forms.TextInput(attrs={
+            'placeholder': 'Country',
+            'class': 'form-control'
+        }))
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -57,3 +81,11 @@ class UserProfileForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
     
+    # def clean(self):
+    #     clean_data = super(UserProfileForm, self).clean()
+    #     address_line_1 = clean_data.get('address_line_1')
+    #     address_line_2 = clean_data.get('address_line_2')
+    #     state = clean_data.get('address_line_2')
+    #     city = clean_data.get('address_line_2')
+    #     country = clean_data.get('address_line_2')
+    #     profile_picture = clean_data.get('address_line_2')

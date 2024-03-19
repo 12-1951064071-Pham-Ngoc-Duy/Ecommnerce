@@ -10,38 +10,61 @@
           <article class="card-body">
             
             <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
-            <form action="{% url 'register' %}" method="POST">
+            <form action="{% url 'register' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                     <div class="form-row">
                         <div class="col form-group">
                             <label>First name</label>
-                              {{ form.first_name }}
+                              {{ registration_form.first_name }}
                         </div> <!-- form-group end.// -->
                         <div class="col form-group">
                             <label>Last name</label>
-                              {{ form.last_name }}
+                              {{ registration_form.last_name }}
                         </div> <!-- form-group end.// -->
                     </div> <!-- form-row end.// -->
                     <div class="form-row">
                         <div class="form-group col-md-6">
                           <label>Email Address</label>
-                          {{ form.email }}
+                          {{ registration_form.email }}
                         </div> <!-- form-group end.// -->
                         <div class="form-group col-md-6">
                           <label>Phone Number</label>
-                          {{ form.phone_number }}
+                          {{ registration_form.phone_number }}
                         </div> <!-- form-group end.// -->
                     </div> <!-- form-row.// -->
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Create password</label>
-                            {{ form.password }}
+                            {{ registration_form.password }}
                         </div> <!-- form-group end.// --> 
                         <div class="form-group col-md-6">
                             <label>Repeat password</label>
-                            {{ form.re_password }}
+                            {{ registration_form.re_password }}
                         </div> <!-- form-group end.// -->  
                     </div>
+                    <div class="form-group">
+                      <label>Address Line 1</label>
+                      {{ profile_form.address_line_1 }}
+                  </div>
+                  <div class="form-group">
+                      <label>Address Line 2</label>
+                      {{ profile_form.address_line_2 }}
+                  </div>
+                  <div class="form-group">
+                      <label>City</label>
+                      {{ profile_form.city }}
+                  </div>
+                  <div class="form-group">
+                      <label>State</label>
+                      {{ profile_form.state }}
+                  </div>
+                  <div class="form-group">
+                      <label>Country</label>
+                      {{ profile_form.country }}
+                  </div>
+                  <div class="form-group">
+                    <input type="file" name="profile_picture">
+                  </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-dark btn-block"> Register  </button>
                     </div> <!-- form-group// --> 

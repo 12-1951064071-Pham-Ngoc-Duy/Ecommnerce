@@ -25,10 +25,11 @@ def is_digit(s):
     return s.isdigit()
 def register(request):
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            phone_number = form.cleaned_data['phone_number']
-            password = form.cleaned_data['password']
+        registration_form = RegistrationForm(request.POST, request.FILES)
+        profile_picture = UserProfileForm(request.POST, request.FILES)
+        if registration_form.is_valid():
+            phone_number = registration_form.cleaned_data['phone_number']
+            password = registration_form.cleaned_data['password']
             hashed_password = make_password(password)
             if Account.objects.filter(phone_number=phone_number).exists():
                 messages.error(request, 'Your phone number already exists')
@@ -40,30 +41,34 @@ def register(request):
                 messages.error(request, 'Phone number must contain only digits')
                 return redirect('register')
             else:
-                first_name = form.cleaned_data['first_name']
-                last_name = form.cleaned_data['last_name']
-                phone_number = form.cleaned_data['phone_number']
-                email = form.cleaned_data['email']
-                password = form.cleaned_data['password']
+                first_name = registration_form.cleaned_data['first_name']
+                last_name = registration_form.cleaned_data['last_name']
+                phone_number = registration_form.cleaned_data['phone_number']
+                email = registration_form.cleaned_data['email']
+                password = registration_form.cleaned_data['password']
                 username = email.split("@")[0]
                 user = Account.objects.create(first_name=first_name, last_name=last_name,email=email,username=username,password=hashed_password)
                 user.phone_number = phone_number
                 user.save()
 
-            current_site = get_current_site(request)
-            mail_subject = 'Please activate your account'
-            message = render_to_string('accounts/account_verification_email.html', {
-                'user': user,
-                'domain': current_site, 
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': default_token_generator.make_token(user),
-            })
-            to_email = email
-            send_email = EmailMessage(mail_subject, message, to=[to_email])
-            send_email.send()
+                profile = profile_picture.save(commit=False)
+                profile.user = user
+                profile.save()
+
+                current_site = get_current_site(request)
+                mail_subject = 'Please activate your account'
+                message = render_to_string('accounts/account_verification_email.html', {
+                    'user': user,
+                    'domain': current_site, 
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': default_token_generator.make_token(user),
+                })
+                to_email = email
+                send_email = EmailMessage(mail_subject, message, to=[to_email])
+                send_email.send()
 
             # messages.success(request, 'Thanks you for registering with us. We have sent you a verification email to your email address')
-            return redirect('/accounts/login/?command=verification&email='+email)
+                return redirect('/accounts/login/?command=verification&email='+email)
         else:
             email = request.POST.get('email')
             password = request.POST.get('password')
@@ -76,9 +81,11 @@ def register(request):
                 return redirect('register')
             
     else:
-        form = RegistrationForm()
+        registration_form = RegistrationForm()
+        profile_form = UserProfileForm()
     context = {
-        'form':form,
+        'registration_form':registration_form,
+        'profile_form': profile_form,
     }
     return render(request, 'accounts/register.html', context)
 
@@ -187,8 +194,11 @@ def dashboard(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     order_count = orders.count()
 
+    userprofile = UserProfile.objects.get(user_id=request.user.id)
+
     context = {
         'order_count': order_count,
+        'userprofile': userprofile,
     }
     return render(request, 'accounts/dashboard.html', context)
 
