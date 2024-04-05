@@ -263,6 +263,13 @@ def edit_profile(request):
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
         if user_form.is_valid() and profile_form.is_valid():
+            phone_number = user_form.cleaned_data['phone_number']
+            if Account.objects.filter(phone_number=phone_number).exists():
+                messages.error(request, 'Your phone number already exists')
+                return redirect('edit_profile')
+            elif not all(is_digit(c) for c in phone_number):
+                messages.error(request, 'Phone number must contain only digits')
+                return redirect('edit_profile')
             user_form.save()
             profile_form.save()
             messages.success(request, 'Your profile has been updated')
